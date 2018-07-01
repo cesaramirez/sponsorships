@@ -32,24 +32,24 @@ class NewsSponsorshipTest extends TestCase
     public function sponsorable_slots_are_listed_in_chronological_order()
     {
         $sponsorable      = factory(Sponsorable::class)->create(['slug' => 'the-acme-company']);
-        $sponsorableSlots = new EloquentCollection([
-            $slotA = factory(SponsorableSlot::class)
+
+        $slotA = factory(SponsorableSlot::class)
                                 ->create([
-                                    'publish_date' => now(), 
-                                    'sponsorable_id' => $sponsorable->id 
-                                ]),
-            $slotB = factory(SponsorableSlot::class)
+                                    'publish_date'   => now(),
+                                    'sponsorable_id' => $sponsorable->id,
+                                ]);
+        $slotB = factory(SponsorableSlot::class)
                                 ->create([
-                                    'publish_date' => now()->addWeeks(1), 
-                                    'sponsorable_id' => $sponsorable->id 
-                                ]),
-            $slotC = factory(SponsorableSlot::class)
+                                    'publish_date'   => now()->addWeeks(1),
+                                    'sponsorable_id' => $sponsorable->id,
+                                ]);
+        $slotC = factory(SponsorableSlot::class)
                                 ->create([
-                                    'publish_date' => now()->addWeeks(2), 
-                                    'sponsorable_id' => $sponsorable->id 
-                                ]),
-        ]);
-        $response    = $this->withoutExceptionHandling()->get('/the-acme-company/sponsorships/new');
+                                    'publish_date'   => now()->addWeeks(2),
+                                    'sponsorable_id' => $sponsorable->id,
+                                ]);
+
+        $response = $this->get('/the-acme-company/sponsorships/new');
         $response->assertSuccessful();
         $this->assertTrue($response->data('sponsorable')->is($sponsorable));
 
@@ -57,8 +57,7 @@ class NewsSponsorshipTest extends TestCase
         $this->assertTrue($response->data('sponsorableSlots')[0]->is($slotA));
         $this->assertTrue($response->data('sponsorableSlots')[1]->is($slotB));
         $this->assertTrue($response->data('sponsorableSlots')[2]->is($slotC));
-        
+    }
 
-        $sponsorableSlots->assertEquals($response->data('sponsorableSlots'));
     }
 }
