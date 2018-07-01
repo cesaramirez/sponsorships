@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class NewsSponsorshipTest extends TestCase
+class ViewNewsSponsorshipPageTest extends TestCase
 {
     use RefreshDatabase;
 
