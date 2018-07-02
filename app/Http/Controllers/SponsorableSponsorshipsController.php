@@ -10,7 +10,7 @@ class SponsorableSponsorshipsController extends Controller
     {
         $sponsorable      = Sponsorable::findOrFailBySlug($slug);
         $sponsorableSlots = $sponsorable->slots()
-                                        ->purchasable()
+                                        ->sponsorable()
                                         ->orderBy('publish_date')
                                         ->get();
 

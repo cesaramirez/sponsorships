@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Purchase;
 use App\Sponsorable;
 use App\SponsorableSlot;
+use App\Sponsorship;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -33,7 +33,7 @@ class ViewNewsSponsorshipPageTest extends TestCase
     /** @test */
     public function sponsorable_slots_are_listed_in_chronological_order()
     {
-        $sponsorable      = factory(Sponsorable::class)->create(['slug' => 'the-acme-company']);
+        $sponsorable = factory(Sponsorable::class)->create(['slug' => 'the-acme-company']);
 
         $slotA = factory(SponsorableSlot::class)
                                 ->create([
@@ -98,28 +98,29 @@ class ViewNewsSponsorshipPageTest extends TestCase
     /** @test */
     public function only_purchasable_sponsorable_slots_are_listed()
     {
-        $sponsorable = factory(Sponsorable::class)->create(['slug' => 'the-acme-company']);
-        $purchase    = factory(Purchase::class)->create();
+        $sponsorable    = factory(Sponsorable::class)->create(['slug' => 'the-acme-company']);
+        $sponsorship    = factory(Sponsorship::class)->create();
 
-        $slotA            = factory(SponsorableSlot::class)
-                                ->create([
-                                    'sponsorable_id' => $sponsorable->id,
-                                ]);
+        $slotA = factory(SponsorableSlot::class)
+                    ->create([
+                        'sponsorable_id' => $sponsorable->id,
+                    ]);
         $slotB = factory(SponsorableSlot::class)
-                                ->create([
-                                    'sponsorable_id' => $sponsorable->id,
-                                    'purchase_id'    => $purchase->id,
-                                ]);
+                    ->create([
+                        'sponsorable_id' => $sponsorable->id,
+                        'sponsorship_id' => $sponsorship->id,
+                    ]);
         $slotC = factory(SponsorableSlot::class)
-                                ->create([
-                                    'sponsorable_id' => $sponsorable->id,
-                                    'purchase_id'    => $purchase->id,
-                                ]);
+                    ->create([
+                        'sponsorable_id' => $sponsorable->id,
+                        'sponsorship_id' => $sponsorship->id,
+                    ]);
         $slotD = factory(SponsorableSlot::class)
-                                ->create([
-                                    'sponsorable_id' => $sponsorable->id,
-                                ]);
-        $response    = $this->get('/the-acme-company/sponsorships/new');
+                    ->create([
+                        'sponsorable_id' => $sponsorable->id,
+                    ]);
+
+        $response = $this->get('/the-acme-company/sponsorships/new');
         $response->assertSuccessful();
         $this->assertTrue($response->data('sponsorable')->is($sponsorable));
 
