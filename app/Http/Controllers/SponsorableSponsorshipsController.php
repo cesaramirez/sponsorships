@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Sponsorable;
+use App\SponsorableSlot;
+use App\Sponsorship;
 
 class SponsorableSponsorshipsController extends Controller
 {
@@ -15,5 +17,16 @@ class SponsorableSponsorshipsController extends Controller
                                         ->get();
 
         return view('sponsorable-sponsorships.new', compact('sponsorable', 'sponsorableSlots'));
+    }
+
+    public function store()
+    {
+        $sponsorship = Sponsorship::create();
+
+        $slots = SponsorableSlot::whereIn('id', request('sponsorable_slots'))->get();
+
+        $slots->each->update(['sponsorship_id' => $sponsorship->id]);
+
+        return response()->json([], 201);
     }
 }

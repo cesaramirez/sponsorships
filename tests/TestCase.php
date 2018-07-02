@@ -14,6 +14,8 @@ abstract class TestCase extends BaseTestCase
     protected function setUp()
     {
         parent::setUp();
+
+        $this->withoutExceptionHandling();
         TestResponse::macro('data', function ($key) {
             return $this->original->getData()[$key];
         });
