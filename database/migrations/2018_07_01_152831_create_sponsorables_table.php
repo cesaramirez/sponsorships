@@ -13,6 +13,7 @@ class CreateSponsorablesTable extends Migration
     {
         Schema::create('sponsorables', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name');
             $table->string('slug')->unique();
             $table->timestamps();
         });

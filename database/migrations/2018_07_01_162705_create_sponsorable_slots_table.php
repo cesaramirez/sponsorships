@@ -15,6 +15,7 @@ class CreateSponsorableSlotsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('sponsorable_id');
             $table->unsignedInteger('sponsorship_id')->nullable();
+            $table->integer('price');
             $table->dateTime('publish_date');
             $table->timestamps();
         });
