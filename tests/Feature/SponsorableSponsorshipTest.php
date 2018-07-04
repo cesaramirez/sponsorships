@@ -27,7 +27,6 @@ class SponsorableSponsorshipTest extends TestCase
         $response = $this->postJson('/the-acme-company/sponsorships', [
             'email'                  => 'john@email.com',
             'company_name'           => 'Digital TechnoSoft Inc',
-            'amount'                 => 75000,
             'sponsorable_slots'      => [
                 $slotA->getKey(), $slotC->getKey(),
             ],
@@ -51,5 +50,30 @@ class SponsorableSponsorshipTest extends TestCase
         $this->assertEquals('john@email.com', $charge->email());
         $this->assertEquals(75000, $charge->amount());
         $this->assertEquals("{$sponsorable->name} sponsorship", $charge->description());
+    }
+
+    /** @test */
+    public function a_valid_payment_token_is_required()
+    {
+        $paymentGateway = $this->app->instance(PaymentGateway::class, new FakePaymentGateway());
+        $sponsorable    = factory(Sponsorable::class)->create(['slug' => 'the-acme-company', 'name' => 'The Acme Company']);
+
+        $slot = factory(SponsorableSlot::class)->create(['price' => 50000, 'sponsorable_id' => $sponsorable->id, 'publish_date' => now()->addMonths(1)]);
+
+        $response = $this->postJson('/the-acme-company/sponsorships', [
+            'email'             => 'john@email.com',
+            'company_name'      => 'Digital TechnoSoft Inc',
+            'amount'            => 75000,
+            'payment_token'     => 'not-at-valid-token',
+            'sponsorable_slots' => [
+                $slot->getKey(),
+            ],
+        ]);
+
+        $response->assertStatus(422);
+
+        $this->assertEquals(0, Sponsorship::count());
+        $this->assertNul($slot->fresh()->sponsorship_id);
+        $this->assertCount(0, $paymentGateway->charges());
     }
 }

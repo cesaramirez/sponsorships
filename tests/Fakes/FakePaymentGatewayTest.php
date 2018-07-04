@@ -2,6 +2,7 @@
 
 namespace Tests\Fakes;
 
+use App\Exceptions\PaymentFailedException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\FakePaymentGateway;
 use Tests\TestCase;
@@ -33,5 +34,19 @@ class FakePaymentsGatewayTest extends TestCase
         $this->assertEquals('julia@email.com', $charges[2]->email());
         $this->assertEquals(7500, $charges[2]->amount());
         $this->assertEquals('Example description C', $charges[2]->description());
+    }
+
+    /** @test */
+    public function charging_requires_a_valid_payment_token()
+    {
+        $paymentGateway =  new FakePaymentGateway();
+        try {
+            $paymentGateway->charge('john@email.com', 25000, 'invalid-payment-token', 'Example description.');
+            $this->fail('The charge succeeded even though the payment token was invalid.');
+        } catch (PaymentFailedException $e) {
+        }
+
+        $charges = $paymentGateway->charges();
+        $this->assertCount(0, $charges);
     }
 }
